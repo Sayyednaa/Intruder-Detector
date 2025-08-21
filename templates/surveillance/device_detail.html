@@ -1,0 +1,65 @@
+{% extends 'surveillance/base.html' %}
+{% block title %}Device {{ dev.name }}{% endblock %}
+
+{% block content %}
+  <!-- Device Info Card -->
+  <div class="glass-card">
+    <h2 style="margin-top:0;">📡 {{ dev.name }}</h2>
+    <p>
+      Token: 
+      <code style="
+        background: rgba(255,255,255,0.6);
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #333;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+      ">
+        {{ dev.token }}
+      </code>
+    </p>
+    <p>
+      <img class="thumb" src="/api/last_frame/{{ dev.token }}.jpg"
+           style="border-radius:16px; box-shadow:0 6px 18px rgba(0,0,0,0.12);" />
+    </p>
+  </div>
+
+  <!-- Events Section -->
+  <div class="glass-card" style="margin-top:2rem;">
+    <h3 style="margin-top:0;">📂 Recent Events</h3>
+    <div class="grid">
+      {% for e in events %}
+        <article class="glass-subcard">
+          <header style="font-size:0.9rem; color:rgba(0,0,0,0.7); margin-bottom:0.5rem;">
+            {{ e.timestamp }} · <strong>{{ e.kind }}</strong> · score={{ e.score|floatformat:2 }}
+          </header>
+          <img class="thumb" src="{{ e.snapshot.url }}" 
+               style="border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08);" />
+        </article>
+      {% empty %}
+        <p style="color:rgba(0,0,0,0.6);">No events yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  
+
+  <style>
+    /* Smaller frosted card for events */
+    .glass-subcard {
+      background: rgba(255,255,255,0.35);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .glass-subcard:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+  </style>
+{% endblock %}

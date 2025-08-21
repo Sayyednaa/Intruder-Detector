@@ -1,0 +1,134 @@
+{% extends 'surveillance/base.html' %}
+{% block title %}Events{% endblock %}
+
+{% block content %}
+  <h2 style="margin-bottom:1rem;">🚨 Human Intrusions</h2>
+
+  <div class="grid">
+    <form method="post" action="{% url 'delete_all_data' %}" 
+      onsubmit="return confirm('Are you sure you want to delete ALL intrusions and frames?');">
+    {% csrf_token %}
+    <button type="submit" class="glass-btn danger" style="margin-top:10px; align-self:center;">
+        Delete All Intrusions & Frames
+    </button>
+</form>
+
+    {% for e in events %}
+      {% if e.kind == "human" %}
+      <div class="glass-subcard">
+        <header>
+          <strong>{{ e.device.name }}</strong> · 
+          {{ e.timestamp }} · 
+          <span>{{ e.kind }}</span>
+        </header>
+        <img class="thumb" src="{{ e.snapshot.url }}" />
+
+         
+      </div>
+      {% endif %}
+    {% empty %}
+      <p>No events yet.</p>
+    {% endfor %}
+     
+  </div>
+  <script>
+// Select / deselect all checkboxes
+document.getElementById('selectAll').addEventListener('change', function(){
+    const checkboxes = document.querySelectorAll('input[name="selected_ids"]');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+</script>
+
+  <hr class="divider">
+
+  <h2 class="section-title">📷 Other Events</h2>
+  <div class="grid">
+    {% for e in events %}
+      {% if e.kind != "human" %}
+      <div class="glass-subcard">
+        <header>
+          <strong>{{ e.device.name }}</strong> · 
+          {{ e.timestamp }} · 
+          <span>{{ e.kind }}</span>
+        </header>
+        <img class="thumb" src="{{ e.snapshot.url }}" />
+      </div>
+      {% endif %}
+    {% empty %}
+      <p>No events yet.</p>
+    {% endfor %}
+  </div>
+
+<style>
+  body {
+    background: url('/static/bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  .glass-subcard {
+    position: relative;
+    border-radius: 24px;
+    padding: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+
+    /* Liquid Glass Core */
+    background: linear-gradient(
+      135deg,
+      rgba(255,255,255,0.35),
+      rgba(255,255,255,0.05)
+    );
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+
+    /* Glow + depth */
+    box-shadow: 
+      0 4px 20px rgba(0,0,0,0.15),
+      inset 0 1px 4px rgba(255,255,255,0.3);
+
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .glass-subcard::before {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(
+      circle at top left,
+      rgba(255,255,255,0.6),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  .glass-subcard:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 
+      0 6px 28px rgba(0,0,0,0.25),
+      inset 0 1px 6px rgba(255,255,255,0.35);
+  }
+
+  .glass-subcard header {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  }
+
+  .glass-subcard header strong { color: #00c6ff; }
+  .glass-subcard header span { color: #0ff99e; }
+
+  .thumb {
+    border-radius: 18px;
+    width: 100%;
+    height: auto;
+    display: block;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+</style>
+
+{% endblock %}

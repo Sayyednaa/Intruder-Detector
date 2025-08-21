@@ -1,0 +1,57 @@
+{% extends 'surveillance/base.html' %}
+{% block title %}Monitor{% endblock %}
+
+{% block content %}
+  <h2 style="margin-bottom:1rem;">📺 Live Monitor</h2>
+
+  <div class="grid">
+    {% for dev in devices %}
+      <div class="glass-subcard">
+        <!-- Device Header -->
+        <header style="margin-bottom:0.5rem;">
+          <strong style="color:#007aff;">{{ dev.name }}</strong>
+          <span style="font-size:0.85rem; color:rgba(0,0,0,0.6);">
+            · last seen {{ dev.last_seen|timesince }} ago
+          </span>
+        </header>
+
+        <!-- Video/Thumbnail -->
+        <div style="background:rgba(255,255,255,0.25); border-radius:14px; overflow:hidden;
+                    box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+          <img src="/api/last_frame/{{ dev.token }}.jpg" alt="{{ dev.name }} feed"
+               style="width:100%; display:block;" />
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex; gap:0.5rem; margin-top:0.8rem;">
+          <a href="/devices/{{ dev.id }}/" class="glass-btn" style="flex:1; text-align:center;">
+            📂 Details
+          </a>
+          <a href="/client/?token={{ dev.token }}" target="_blank" 
+             class="glass-btn secondary" style="flex:1; text-align:center;">
+            ▶️ View Live
+          </a>
+        </div>
+      </div>
+    {% empty %}
+      <p style="color:rgba(0,0,0,0.6);">No devices are active.</p>
+    {% endfor %}
+  </div>
+
+  <style>
+    .glass-subcard {
+      background: rgba(255,255,255,0.35);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 1rem;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .glass-subcard:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+    }
+  </style>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'surveillance/base.html' %}
+{% block title %}Devices{% endblock %}
+
+{% block content %}
+  <!-- Header -->
+  <h2 style="margin-bottom:1rem;">📟 Devices</h2>
+
+  <!-- Add Device Form -->
+  <div class="glass-card" style="margin-bottom:2rem;">
+    <form method="post" style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center;">
+      {% csrf_token %}
+      <input name="name" placeholder="Device name" required 
+             style="flex:1; min-width:200px;" />
+      <input name="motion_sensitivity" step="0.01" type="number" min="0.01" max="0.9" value="0.15"
+             style="width:120px;" />
+      <button type="submit" class="glass-btn">➕ Add Device</button>
+    </form>
+  </div>
+
+  <!-- Devices Grid -->
+  <div class="grid">
+    {% for d in devices %}
+      <div class="glass-subcard">
+        <h3 style="margin-top:0; font-size:1.1rem;">
+          <a href="/devices/{{d.id}}/" style="text-decoration:none; color:#007aff;">
+            {{ d.name }}
+          </a>
+        </h3>
+        <p style="font-size:0.9rem; margin:0 0 0.5rem 0;">
+          Token: <code style="
+            background:rgba(255,255,255,0.6);
+            padding:2px 6px;
+            border-radius:8px;
+            font-size:0.8rem;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+          ">{{ d.token }}</code>
+        </p>
+        <p style="font-size:0.85rem; color:rgba(0,0,0,0.65); margin:0 0 1rem 0;">
+          Last seen: {{ d.last_seen|default:"—" }}
+        </p>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <a href="/client/?token={{ d.token }}" target="_blank" class="glass-btn" 
+             style="flex:1; text-align:center;">▶️ Client</a>
+       <a href="javascript:void(0);" class="glass-btn secondary" 
+   style="flex:1; text-align:center;"
+   onclick="openQR({{ d.id }})">📷 QR</a>
+
+        </div>
+        <form method="post" action="/device/delete/{{d.id}}/" 
+      onsubmit="return confirm('Are you sure you want to delete this device and all its data?');" 
+      style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="glass-btn danger">Delete Device</button>
+</form>
+
+      </div>
+    {% empty %}
+      <p style="color:rgba(0,0,0,0.6);">No devices registered yet.</p>
+    {% endfor %}
+  </div>
+<!-- QR Modal -->
+<div id="qrModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+     background: rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:1000;">
+    <div style="position:relative; background:white; padding:20px; border-radius:12px; text-align:center;">
+        <span style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px;" 
+              onclick="closeQR()">&times;</span>
+        <img id="qrImage" src="" alt="QR Code" style="max-width:300px; max-height:300px;">
+    </div>
+</div>
+<script>
+function openQR(deviceId) {
+    const img = document.getElementById('qrImage');
+    img.src = `/pair/${deviceId}/`;  // URL to your existing view
+    document.getElementById('qrModal').style.display = 'flex';
+}
+
+function closeQR() {
+    document.getElementById('qrModal').style.display = 'none';
+    document.getElementById('qrImage').src = '';
+}
+
+// Optional: close when clicking outside the modal content
+window.onclick = function(event) {
+    const modal = document.getElementById('qrModal');
+    if (event.target == modal) {
+        closeQR();
+    }
+}
+</script>
+
+  <style>
+    .glass-subcard {
+      background: rgba(255,255,255,0.35);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 1.2rem;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .glass-subcard:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+    }
+  </style>
+{% endblock %}

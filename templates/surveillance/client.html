@@ -1,0 +1,92 @@
+{% extends 'surveillance/base.html' %}
+{% load static %}
+{% block title %}Client: {{ device.name }}{% endblock %}
+{% block content %}
+<div class="glass-card">
+  <h2>📱 Client: {{ device.name }}</h2>
+  <p style="color:rgba(0,0,0,0.65);">
+    Keep this tab open to stream.<br>
+    <small>🔋 Battery tips: lower brightness, keep phone plugged in.</small>
+  </p>
+
+  <input type="hidden" id="token" value="{{ device.token }}" />
+
+  <video id="video" autoplay playsinline muted
+    style="
+      width:100%;
+      max-width:480px;
+      border-radius:20px;
+      margin: 1rem 0;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+      border: 1px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    ">
+  </video>
+
+  <canvas id="canvas" style="display:none"></canvas>
+
+  <div style="display:flex; gap:1rem; margin-top:1rem;">
+    <button id="start" class="glass-btn">▶️ Start</button>
+    <button id="stop" class="glass-btn secondary">⏹ Stop</button>
+  </div>
+</div>
+
+<script src="{% static 'surveillance/client.js' %}"></script>
+
+<style>
+  .glass-btn {
+    position: relative;
+    flex:1;
+    padding: 0.7rem 1rem;
+    border-radius: 50px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .glass-btn::before {
+    content:"";
+    position: absolute;
+    top:-50%;
+    left:-50%;
+    width:200%;
+    height:200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10.01%);
+    background-size:20px 20px;
+    transform: scale(0);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    border-radius:50%;
+    pointer-events:none;
+  }
+
+  .glass-btn:hover::before {
+    transform: scale(1);
+    opacity:1;
+  }
+
+  .glass-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  }
+
+  .glass-btn.secondary {
+    background: linear-gradient(135deg, rgba(255,200,200,0.6), rgba(255,180,180,0.3));
+    color:#a00;
+  }
+
+  #video:hover {
+    box-shadow: 0 12px 24px rgba(0,0,0,0.16);
+    transform: scale(1.02);
+    border: 1px solid rgba(255,255,255,0.6);
+  }
+</style>
+{% endblock %}
